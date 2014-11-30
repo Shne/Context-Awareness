@@ -3,23 +3,22 @@ package jhk.context_awareness;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 
 import java.util.ArrayList;
 
 /**
  * Created by jhk on 11/30/14.
  */
-public class AccelerometerDataProvider implements SensorEventListener {
+public class AccelerometerWindowProvider implements SensorEventListener, WindowProvider<AccelerometerData[]> {
 
 	private int windowSize;
 	private AccelerometerData[] window1;
 	private AccelerometerData[] window2;
 	private int window1Index;
 	private int window2Index;
-	private ArrayList<Consumer> consumers;
+	private ArrayList<WindowConsumer<AccelerometerData[]>> windowConsumers;
 
-	public AccelerometerDataProvider(int windowSize) {
+	public AccelerometerWindowProvider(int windowSize) {
 		this.windowSize = windowSize;
 		window1 = new AccelerometerData[windowSize];
 		window2 = new AccelerometerData[windowSize];
@@ -29,7 +28,7 @@ public class AccelerometerDataProvider implements SensorEventListener {
 		}
 		window2Index = 0;
 
-		consumers = new ArrayList<Consumer>();
+		windowConsumers = new ArrayList<WindowConsumer<AccelerometerData[]>>();
 	}
 
 	@Override
@@ -55,16 +54,18 @@ public class AccelerometerDataProvider implements SensorEventListener {
 		}
 	}
 
-	public void registerConsumer(Consumer c) {
-		consumers.add(c);
+	@Override
+	public void registerConsumer(WindowConsumer<AccelerometerData[]> c) {
+		windowConsumers.add(c);
 	}
 
-	public void unregisterConsumer(Consumer c) {
-		consumers.remove(c);
+	@Override
+	public void unregisterConsumer(WindowConsumer<AccelerometerData[]> c) {
+		windowConsumers.remove(c);
 	}
 
 	private void provideConsumers(AccelerometerData[] window) {
-		for(Consumer c : consumers) {
+		for(WindowConsumer c : windowConsumers) {
 			c.consume(window);
 		}
 	}

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Created by jhk on 11/30/14.
  */
-public class MovementInferer implements Consumer<AccelerometerData[]>, ContextProvider<MovementType> {
+public class MovementInferer implements WindowConsumer<AccelerometerData[]>, ContextProvider<MovementType> {
 	private ArrayList<ContextListener<MovementType>> contextListeners;
 	private double min;
 	private double max;
@@ -52,10 +52,10 @@ public class MovementInferer implements Consumer<AccelerometerData[]>, ContextPr
 	}
 
 	private void inferContext() {
-		if(max > 25.0) {
+		if(max > 18.0) {
 			context = MovementType.RUNNING;
 			return;
-		} else if(max > 15.0) {
+		} else if(max > 12.0) {
 			context = MovementType.WALKING;
 			return;
 		} else {

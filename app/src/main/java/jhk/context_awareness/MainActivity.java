@@ -3,7 +3,6 @@ package jhk.context_awareness;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
-import android.hardware.SensorEvent;
 import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.view.Menu;
@@ -15,7 +14,7 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
-	private AccelerometerDataProvider adp;
+	private AccelerometerWindowProvider adp;
 	private int windowSize = 32;
 	private String movementType = "Still";
 
@@ -27,7 +26,7 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
 		//Setup accelerometerDataProvider
 		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		adp = new AccelerometerDataProvider(windowSize);
+		adp = new AccelerometerWindowProvider(windowSize);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
