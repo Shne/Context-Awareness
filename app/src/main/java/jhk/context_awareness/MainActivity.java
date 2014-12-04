@@ -29,7 +29,11 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 	}
 
 	private void setupAtScheduledEventDetection() {
-		CalendarLocationDataProvider cldp = new CalendarLocationDataProvider(getApplicationContext());
+		CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(getApplicationContext());
+		EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder();
+		calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
+		//TODO: then some contextprovider taking a CalendarEvent and tries to figure out if the user is there
+		//TODO: it should probably also use a different DataProvider providing the users current location
 	}
 
 	private void setupMovementDetection() {

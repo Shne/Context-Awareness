@@ -4,7 +4,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract.Instances;
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,20 +11,20 @@ import java.util.List;
 /**
  * Created by jhk on 12/4/14.
  */
-public class CalendarLocationDataProvider implements DataProvider<EventLocation> {
-	private List<DataConsumer<EventLocation>> dataConsumers;
-	private String TAG = "Context-Awareness";
+public class CalendarLocationDataProvider implements DataProvider<CalendarEvent> {
+	private List<DataConsumer<CalendarEvent>> dataConsumers;
 
 	public CalendarLocationDataProvider(Context appContext) {
-		dataConsumers = new ArrayList<DataConsumer<EventLocation>>();
+		dataConsumers = new ArrayList<DataConsumer<CalendarEvent>>();
 
-		Log.i(TAG, "CalendarLocationDataProvider Called");
 		ContentResolver contentResolver = appContext.getContentResolver();
 		long now = System.currentTimeMillis();
-				String[] proj =
-				new String[]{
-						Instances.TITLE,
-						Instances.EVENT_LOCATION};
+		String[] proj = new String[]{
+				Instances.TITLE,
+				Instances.EVENT_LOCATION,
+				Instances.BEGIN,
+		        Instances.END
+		};
 		Cursor cursor = Instances.query(contentResolver, proj, now, now);
 		if (cursor.getCount() > 0) {
 			// deal with conflict
@@ -33,27 +32,26 @@ public class CalendarLocationDataProvider implements DataProvider<EventLocation>
 		if (cursor.moveToFirst()) {
 			do {
 				String title = cursor.getString(0);
-				EventLocation eventLocation = new EventLocation(cursor.getString(1));
-				provideConsumers(eventLocation);
-				Log.i(TAG, title);
-				Log.i(TAG, eventLocation.fromEvent);
+				String location = cursor.getString(1);
+				CalendarEvent calendarEvent = new CalendarEvent(title, location);
+				provideConsumers(calendarEvent);
 			} while (cursor.moveToNext());
 		}
 	}
 
-	private void provideConsumers(EventLocation eventLocation) {
+	private void provideConsumers(CalendarEvent calendarEvent) {
 		for(DataConsumer c : dataConsumers) {
-			c.consume(eventLocation);
+			c.consume(calendarEvent);
 		}
 	}
 
 	@Override
-	public void registerConsumer(DataConsumer<EventLocation> c) {
+	public void registerConsumer(DataConsumer<CalendarEvent> c) {
 		dataConsumers.add(c);
 	}
 
 	@Override
-	public void unregisterConsumer(DataConsumer<EventLocation> c) {
+	public void unregisterConsumer(DataConsumer<CalendarEvent> c) {
 		dataConsumers.remove(c);
 	}
 }
