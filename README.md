@@ -1,6 +1,12 @@
 Context-Awareness
 =================
 
+no event -> sound
+event, available -> sound
+event, busy, no location -> no sound
+event, busy, with location, not there -> sound
+event, busy, with location, there -> no sound
+
 
 References:
 -----------
