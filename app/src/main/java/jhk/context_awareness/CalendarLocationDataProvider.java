@@ -22,6 +22,7 @@ public class CalendarLocationDataProvider implements DataProvider<CalendarEvent>
 		String[] proj = new String[]{
 				Instances.TITLE,
 				Instances.EVENT_LOCATION,
+				Instances.AVAILABILITY,
 				Instances.BEGIN,
 		        Instances.END
 		};
@@ -33,7 +34,8 @@ public class CalendarLocationDataProvider implements DataProvider<CalendarEvent>
 			do {
 				String title = cursor.getString(0);
 				String location = cursor.getString(1);
-				CalendarEvent calendarEvent = new CalendarEvent(title, location);
+				int availability = cursor.getInt(2);
+				CalendarEvent calendarEvent = new CalendarEvent(title, location, availability);
 				provideConsumers(calendarEvent);
 			} while (cursor.moveToNext());
 		}

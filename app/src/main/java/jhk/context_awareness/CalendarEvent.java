@@ -6,12 +6,14 @@ package jhk.context_awareness;
 public class CalendarEvent {
 	public String title;
 	public String location;
+	public int availability;
 	public android.location.Location geoLocation;
 
 	public CalendarEvent() {}
 
-	public CalendarEvent(String title, String location) {
+	public CalendarEvent(String title, String location, int availability) {
 		this.title = title;
 		this.location = location;
+		this.availability = availability;
 	}
 }
