@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
  * Created by jhk on 11/30/14.
  */
-public class MovementInferer implements WindowConsumer<AccelerometerData[]>, ContextProvider<MovementType> {
+public class MovementInferer implements DataConsumer<AccelerometerData[]>, ContextProvider<MovementType> {
 	private ArrayList<ContextListener<MovementType>> contextListeners;
 	private double min;
 	private double max;

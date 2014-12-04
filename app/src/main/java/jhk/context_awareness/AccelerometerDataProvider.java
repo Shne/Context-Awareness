@@ -9,16 +9,16 @@ import java.util.ArrayList;
 /**
  * Created by jhk on 11/30/14.
  */
-public class AccelerometerWindowProvider implements SensorEventListener, WindowProvider<AccelerometerData[]> {
+public class AccelerometerDataProvider implements SensorEventListener, DataProvider<AccelerometerData[]> {
 
 	private int windowSize;
 	private AccelerometerData[] window1;
 	private AccelerometerData[] window2;
 	private int window1Index;
 	private int window2Index;
-	private ArrayList<WindowConsumer<AccelerometerData[]>> windowConsumers;
+	private ArrayList<DataConsumer<AccelerometerData[]>> dataConsumers;
 
-	public AccelerometerWindowProvider(int windowSize) {
+	public AccelerometerDataProvider(int windowSize) {
 		this.windowSize = windowSize;
 		window1 = new AccelerometerData[windowSize];
 		window2 = new AccelerometerData[windowSize];
@@ -28,7 +28,7 @@ public class AccelerometerWindowProvider implements SensorEventListener, WindowP
 		}
 		window2Index = 0;
 
-		windowConsumers = new ArrayList<WindowConsumer<AccelerometerData[]>>();
+		dataConsumers = new ArrayList<DataConsumer<AccelerometerData[]>>();
 	}
 
 	@Override
@@ -55,17 +55,17 @@ public class AccelerometerWindowProvider implements SensorEventListener, WindowP
 	}
 
 	@Override
-	public void registerConsumer(WindowConsumer<AccelerometerData[]> c) {
-		windowConsumers.add(c);
+	public void registerConsumer(DataConsumer<AccelerometerData[]> c) {
+		dataConsumers.add(c);
 	}
 
 	@Override
-	public void unregisterConsumer(WindowConsumer<AccelerometerData[]> c) {
-		windowConsumers.remove(c);
+	public void unregisterConsumer(DataConsumer<AccelerometerData[]> c) {
+		dataConsumers.remove(c);
 	}
 
 	private void provideConsumers(AccelerometerData[] window) {
-		for(WindowConsumer c : windowConsumers) {
+		for(DataConsumer c : dataConsumers) {
 			c.consume(window);
 		}
 	}

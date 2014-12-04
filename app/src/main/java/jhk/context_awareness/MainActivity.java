@@ -14,7 +14,7 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
-	private AccelerometerWindowProvider adp;
+	private AccelerometerDataProvider adp;
 	private int windowSize = 32;
 	private String movementType = "Still";
 
@@ -24,9 +24,18 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		setupMovementDetection();
+		setupAtScheduledEventDetection();
+	}
+
+	private void setupAtScheduledEventDetection() {
+		CalendarLocationDataProvider cldp = new CalendarLocationDataProvider(getApplicationContext());
+	}
+
+	private void setupMovementDetection() {
 		//Setup accelerometerDataProvider
 		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-		adp = new AccelerometerWindowProvider(windowSize);
+		adp = new AccelerometerDataProvider(windowSize);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
 
