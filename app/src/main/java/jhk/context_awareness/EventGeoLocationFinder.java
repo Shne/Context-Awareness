@@ -1,5 +1,12 @@
 package jhk.context_awareness;
 
+import android.content.Context;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.util.Log;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,15 +15,31 @@ import java.util.List;
  */
 public class EventGeoLocationFinder implements DataConsumer<CalendarEvent>, DataProvider<CalendarEvent> {
 	private List<DataConsumer<CalendarEvent>> consumers;
+	private Context appContext;
+	private static String TAG = "Context-Awareness";
 
-	public EventGeoLocationFinder() {
+	public EventGeoLocationFinder(Context appContext) {
+		this.appContext = appContext;
 		consumers = new ArrayList<DataConsumer<CalendarEvent>>();
 	}
 
 	@Override
-	public void consume(CalendarEvent d) {
-		//TODO: Lookup geo location using some API
-		//TODO: save it to the event object and pass it one to consumers
+	public void consume(CalendarEvent e) {
+		Geocoder geocoder = new Geocoder(appContext);
+		try {
+			List<Address> addresses = geocoder.getFromLocationName(e.location, 1);
+			if(addresses.size() > 0) {
+				double latitude = addresses.get(0).getLatitude();
+				double longitude = addresses.get(0).getLongitude();
+				Location loc = new Location("YourMom");
+				loc.setLatitude(latitude);
+				loc.setLongitude(longitude);
+				e.geoLocation = loc;
+				provideConsumers(e);
+			}
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
 	}
 
 	private void provideConsumers(CalendarEvent event) {

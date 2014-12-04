@@ -5,18 +5,20 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 
-public class MainActivity extends Activity implements ContextListener<MovementType> {
+public class MainActivity extends Activity implements ContextListener<MovementType>, DataConsumer<CalendarEvent> {
 
+	private static final String TAG = "Context-Awareness";
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private AccelerometerDataProvider adp;
 	private int windowSize = 32;
-	private String movementType = "Still";
+	private int calendarQueryIntervalMilis = 10000;
 
 
 	@Override
@@ -29,11 +31,13 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 	}
 
 	private void setupAtScheduledEventDetection() {
-		CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(getApplicationContext());
-		EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder();
+		Context appContext = getApplicationContext();
+		CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(appContext, calendarQueryIntervalMilis);
+		EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder(appContext);
 		calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
+		eventGeoLocationFinder.registerConsumer(this);
 		//TODO: then some contextprovider taking a CalendarEvent and tries to figure out if the user is there
-		//TODO: it should probably also use a different DataProvider providing the users current location
+		//TODO: it should probably also use a new DataProvider providing the users current location
 	}
 
 	private void setupMovementDetection() {
@@ -50,10 +54,27 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 	}
 
 	@Override
-	public void onContextChanged(MovementType context) {
-		String msg = "User is "+context.toString();
-		TextView tv = (TextView) findViewById(R.id.textView);
-		tv.setText(msg);
+	public void consume(final CalendarEvent e) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				String msg = "CalendarEvent location is: "+e.geoLocation.getLatitude() +", "+ e.geoLocation.getLongitude();
+				TextView tv = (TextView) findViewById(R.id.LocationTextView);
+				tv.setText(msg);
+			}
+		});
+	}
+
+	@Override
+	public void onContextChanged(final MovementType context) {
+		this.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				String msg = "User is "+context.toString();
+				TextView tv = (TextView) findViewById(R.id.MovementTextView);
+				tv.setText(msg);
+			}
+		});
 	}
 
 	@Override

@@ -5,9 +5,17 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin" tools:context=".MainActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:id="@+id/textView" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" android:orientation="vertical">
+        <TextView android:text="" android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="start"
+                  android:id="@+id/MovementTextView" />
+        <TextView android:text="" android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="start"
+                  android:id="@+id/LocationTextView" />
+    </LinearLayout>
 
 </RelativeLayout>

@@ -4,19 +4,33 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.CalendarContract.Instances;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by jhk on 12/4/14.
  */
 public class CalendarLocationDataProvider implements DataProvider<CalendarEvent> {
+	private static final String TAG = "Context-Awareness";
 	private List<DataConsumer<CalendarEvent>> dataConsumers;
 
-	public CalendarLocationDataProvider(Context appContext) {
+	public CalendarLocationDataProvider(final Context appContext, int queryIntervalMilis) {
 		dataConsumers = new ArrayList<DataConsumer<CalendarEvent>>();
 
+		Timer timer = new Timer();
+		timer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				queryCalendar(appContext);
+			}
+		}, 0, queryIntervalMilis);
+	}
+
+	private void queryCalendar(Context appContext) {
 		ContentResolver contentResolver = appContext.getContentResolver();
 		long now = System.currentTimeMillis();
 		String[] proj = new String[]{
