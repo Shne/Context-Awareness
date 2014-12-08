@@ -36,6 +36,9 @@ public class EventGeoLocationFinder implements DataConsumer<CalendarEvent>, Data
 				loc.setLongitude(longitude);
 				e.geoLocation = loc;
 				provideConsumers(e);
+			} else {
+				e.geoLocation = null;
+				provideConsumers(e);
 			}
 		} catch (IOException e1) {
 			e1.printStackTrace();

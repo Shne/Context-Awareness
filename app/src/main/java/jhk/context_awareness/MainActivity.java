@@ -58,7 +58,12 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 		this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				String msg = "CalendarEvent location is: "+e.geoLocation.getLatitude() +", "+ e.geoLocation.getLongitude();
+				String msg;
+				if(e.geoLocation != null) {
+					msg = "CalendarEvent location is: "+ e.geoLocation.getLatitude() +", "+ e.geoLocation.getLongitude();
+				} else {
+					msg = "CalendarEvent Location could not be found";
+				}
 				TextView tv = (TextView) findViewById(R.id.LocationTextView);
 				tv.setText(msg);
 			}
