@@ -16,11 +16,12 @@ regex = r'ACCELEROMETER::t=(\d+);sT=\d+;cT=\d+;x=(-?\d*\.?\d+);y=(-?\d*\.?\d+);z
 
 for line in sys.stdin:
 	match = re.search(regex, line)
-	# time = int(match.group(1))
-	x = float(match.group(2))
-	y = float(match.group(3))
-	z = float(match.group(4))
-	data.append((x, y, z))
+	if(match):
+		# time = int(match.group(1))
+		x = float(match.group(2))
+		y = float(match.group(3))
+		z = float(match.group(4))
+		data.append((x, y, z))
 
 
 print("@RELATION HURRR")
