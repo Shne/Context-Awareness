@@ -1,0 +1,5 @@
+example log files:
+samples_1418046226628_roland_running.log
+samples_1418046232455_roland_walking.log
+
+python3 process_data.py *.log > roland.arff
