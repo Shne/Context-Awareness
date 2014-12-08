@@ -23,13 +23,12 @@ for line in sys.stdin:
 	data.append((x, y, z))
 
 
-# print("@RELATION HURRR")
-# print("@ATTRIBUTE min NUMERIC")
-# print("@ATTRIBUTE max NUMERIC")
-# print("@ATTRIBUTE dev NUMERIC")
-# print("@ATTRIBUTE class {Walking,Running}")
-# print("@DATA")
-# print("min,max,dev\n")
+print("@RELATION HURRR")
+print("@ATTRIBUTE min NUMERIC")
+print("@ATTRIBUTE max NUMERIC")
+print("@ATTRIBUTE dev NUMERIC")
+print("@ATTRIBUTE class {Walking,Running}")
+print("@DATA")
 
 for window in [data[i:i+windowSize] for i in range(0, len(data)-windowSize, int(windowSize/2))]:
 	eucNorms = [math.sqrt(values[0]*values[0] + values[1]*values[1] + values[2]*values[2]) for values in window]
