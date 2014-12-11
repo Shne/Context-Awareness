@@ -34,7 +34,7 @@ print("@RELATION HURRR")
 print("@ATTRIBUTE min NUMERIC")
 print("@ATTRIBUTE max NUMERIC")
 print("@ATTRIBUTE dev NUMERIC")
-print("@ATTRIBUTE class {walking,running}")
+print("@ATTRIBUTE class {walking,running,driving,still,biking}")
 print("@DATA")
 
 cutlines = 0
