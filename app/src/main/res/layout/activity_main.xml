@@ -23,6 +23,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="start"
             android:id="@+id/CoordiantesTextView" />
+        <TextView
+            android:text="Could not compute distance"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:id="@+id/AtEventTextView" />
     </LinearLayout>
 
 </RelativeLayout>

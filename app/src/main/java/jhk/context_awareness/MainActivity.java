@@ -5,14 +5,14 @@ import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.media.AudioManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
 
-public class MainActivity extends Activity implements ContextListener<MovementType>, LocationConsumer, DataConsumer<CalendarEvent> {
+public class MainActivity extends Activity implements AtEventContextListener ,ContextListener<MovementType>, LocationConsumer, DataConsumer<CalendarEvent> {
 
 	private static final String TAG = "Context-Awareness";
 	private SensorManager sensorManager;
@@ -20,8 +20,8 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 	private AccelerometerDataProvider adp;
 	private int windowSize = 32;
 	private int calendarQueryIntervalMilis = 10000;
-    private Location latestLocation;
-    private Location latestEventLocation;
+    EventGeoLocationFinder eventGeoLocationFinder;
+    LocationProvider locationProvider;
 
 
     @Override
@@ -32,11 +32,24 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 		setupMovementDetection();
 		setupAtScheduledEventDetection();
         setupLocationDetection();
-	}
+        setupDistanceDetection();
+
+        AudioManager am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+        am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+    }
+
+    private void setupDistanceDetection() {
+        Context appContext = getApplicationContext();
+        AtEventContextProvider atEventContextProvider = new AtEventContextProvider();
+        eventGeoLocationFinder.registerConsumer(atEventContextProvider);
+        locationProvider.registerConsumer(atEventContextProvider);
+
+        atEventContextProvider.registerContextListener(this);
+    }
 
     private void setupLocationDetection() {
 		Context appContext = getApplicationContext();
-        LocationProvider locationProvider = new LocationProvider(appContext);
+        locationProvider = new LocationProvider(appContext);
 
         locationProvider.registerConsumer(this);
     }
@@ -44,7 +57,7 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
     private void setupAtScheduledEventDetection() {
         Context appContext = getApplicationContext();
         CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(appContext, calendarQueryIntervalMilis);
-        EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder(appContext);
+        eventGeoLocationFinder = new EventGeoLocationFinder(appContext);
         calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
         eventGeoLocationFinder.registerConsumer(this);
         //TODO: then some contextprovider taking a CalendarEvent and tries to figure out if the user is there
@@ -65,7 +78,6 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
 	@Override
 	public void consume(final CalendarEvent e) {
-        latestEventLocation = e.geoLocation;
 		this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -129,18 +141,26 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
     @Override
     public void consume(final Location l) {
-        latestLocation = l;
 
         this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 String msg;
                 msg = "New location (" + l.getLatitude() + ", " + l.getLongitude() +")" ;
-                if(latestEventLocation != null) {
-                    msg += " Distance to event location: " + l.distanceTo(latestEventLocation) + "m";
-                }
 
                 TextView tv = (TextView) findViewById(R.id.CoordiantesTextView);
+                tv.setText(msg);
+            }
+        });
+    }
+
+    @Override
+    public void onContextChanged(final AtEventType t) {
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String msg = "Is at event? : " +  t.toString();
+                TextView tv = (TextView) findViewById(R.id.AtEventTextView);
                 tv.setText(msg);
             }
         });
