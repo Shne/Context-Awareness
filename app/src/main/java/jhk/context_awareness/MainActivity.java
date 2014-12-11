@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -11,7 +12,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 
-public class MainActivity extends Activity implements ContextListener<MovementType>, DataConsumer<CalendarEvent> {
+public class MainActivity extends Activity implements ContextListener<MovementType>, LocationConsumer, DataConsumer<CalendarEvent> {
 
 	private static final String TAG = "Context-Awareness";
 	private SensorManager sensorManager;
@@ -19,26 +20,35 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 	private AccelerometerDataProvider adp;
 	private int windowSize = 32;
 	private int calendarQueryIntervalMilis = 10000;
+    private Location latestLocation;
+    private Location latestEventLocation;
 
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
 		setupMovementDetection();
 		setupAtScheduledEventDetection();
+        setupLocationDetection();
 	}
 
-	private void setupAtScheduledEventDetection() {
+    private void setupLocationDetection() {
 		Context appContext = getApplicationContext();
-		CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(appContext, calendarQueryIntervalMilis);
-		EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder(appContext);
-		calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
-		eventGeoLocationFinder.registerConsumer(this);
-		//TODO: then some contextprovider taking a CalendarEvent and tries to figure out if the user is there
-		//TODO: it should probably also use a new DataProvider providing the users current location
-	}
+        LocationProvider locationProvider = new LocationProvider(appContext);
+
+        locationProvider.registerConsumer(this);
+    }
+
+    private void setupAtScheduledEventDetection() {
+        Context appContext = getApplicationContext();
+        CalendarLocationDataProvider calendarLocationDataProvider = new CalendarLocationDataProvider(appContext, calendarQueryIntervalMilis);
+        EventGeoLocationFinder eventGeoLocationFinder = new EventGeoLocationFinder(appContext);
+        calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
+        eventGeoLocationFinder.registerConsumer(this);
+        //TODO: then some contextprovider taking a CalendarEvent and tries to figure out if the user is there
+    }
 
 	private void setupMovementDetection() {
 		//Setup accelerometerDataProvider
@@ -55,6 +65,7 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 
 	@Override
 	public void consume(final CalendarEvent e) {
+        latestEventLocation = e.geoLocation;
 		this.runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
@@ -116,6 +127,22 @@ public class MainActivity extends Activity implements ContextListener<MovementTy
 		return super.onOptionsItemSelected(item);
 	}
 
+    @Override
+    public void consume(final Location l) {
+        latestLocation = l;
 
+        this.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String msg;
+                msg = "New location (" + l.getLatitude() + ", " + l.getLongitude() +")" ;
+                if(latestEventLocation != null) {
+                    msg += " Distance to event location: " + l.distanceTo(latestEventLocation) + "m";
+                }
 
+                TextView tv = (TextView) findViewById(R.id.CoordiantesTextView);
+                tv.setText(msg);
+            }
+        });
+    }
 }
