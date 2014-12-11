@@ -4,7 +4,6 @@ import statistics
 import math
 import fileinput
 
-
 ############
 ### VARS ###
 ############
@@ -20,15 +19,23 @@ for line in fileinput.input():
 	if(fileinput.isfirstline()):
 		filename = fileinput.filename()
 		dataDict[filename] = []
-		dataClass = re.search(r'_([^_]+)\.log$', fileinput.filename()).group(1)
+		dataClass = re.search(r'_([^_]+)\.(log|csv)$', fileinput.filename()).group(1)
 
-	match = re.search(regex, line)
-	if(match):
-		time = int(match.group(1))
-		x = float(match.group(2))
-		y = float(match.group(3))
-		z = float(match.group(4))
-		dataDict[filename].append((x, y, z, dataClass, time))
+	if not 'csv' in filename:
+		match = re.search(regex, line)
+		if(match):
+			time = int(match.group(1))
+			x = float(match.group(2))
+			y = float(match.group(3))
+			z = float(match.group(4))
+			dataDict[filename].append((x, y, z, dataClass, time))
+	else:
+		row = line.split(',')
+		time = int(row[1])
+		x = float(row[11])
+		y = float(row[12])
+		z = float(row[13])
+		dataDict[filename].append((x,y,z,dataClass,time))
 
 print("@RELATION HURRR")
 print("@ATTRIBUTE min NUMERIC")
