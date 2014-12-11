@@ -8,7 +8,7 @@ import fileinput
 ### VARS ###
 ############
 dataDict = dict()
-windowSize = 256
+windowSize = 128
 
 #######################
 ### PARSE this shit ###
@@ -41,7 +41,7 @@ print("@RELATION HURRR")
 print("@ATTRIBUTE min NUMERIC")
 print("@ATTRIBUTE max NUMERIC")
 print("@ATTRIBUTE dev NUMERIC")
-print("@ATTRIBUTE class {walking,running,driving,still,biking}")
+print("@ATTRIBUTE class {still,walking,running,biking,driving}")
 print("@DATA")
 
 cutlines = 0

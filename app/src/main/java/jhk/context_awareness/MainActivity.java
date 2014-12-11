@@ -14,11 +14,10 @@ import android.widget.TextView;
 
 public class MainActivity extends Activity implements AtEventContextListener ,ContextListener<MovementType>, LocationConsumer, DataConsumer<CalendarEvent> {
 
-	private static final String TAG = "Context-Awareness";
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private AccelerometerDataProvider adp;
-	private int windowSize = 32;
+	private int windowSize = 128;
 	private int calendarQueryIntervalMilis = 10000;
     EventGeoLocationFinder eventGeoLocationFinder;
     LocationProvider locationProvider;
@@ -68,10 +67,10 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 		sensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 		adp = new AccelerometerDataProvider(windowSize);
 		accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
 
 		//setup movement inferer
-		MovementInferer movementInferer = new MovementInferer();
+		MovementInferer movementInferer = new MovementInferer(getApplicationContext());
 		movementInferer.registerContextListener(this); //we listen to the movement inferer
 		adp.registerConsumer(movementInferer); //the movement inferer listens to the accelerometer data provider
 	}
@@ -112,17 +111,17 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 		return true;
 	}
 
-	@Override
-	protected void onPause() {
-		super.onPause();
-		sensorManager.unregisterListener(adp);
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_NORMAL);
-	}
+//	@Override
+//	protected void onPause() {
+//		super.onPause();
+//		sensorManager.unregisterListener(adp);
+//	}
+//
+//	@Override
+//	protected void onResume() {
+//		super.onResume();
+//		sensorManager.registerListener(adp, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+//	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

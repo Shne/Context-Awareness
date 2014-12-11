@@ -45,10 +45,12 @@ public class AccelerometerDataProvider implements SensorEventListener, DataProvi
 
 			if (window1Index == windowSize) {
 				this.provideConsumers(window1);
+				window1 = new AccelerometerData[windowSize];
 				window1Index = 0;
 			}
 			if(window2Index == windowSize) {
 				this.provideConsumers(window2);
+				window2 = new AccelerometerData[windowSize];
 				window2Index = 0;
 			}
 		}
