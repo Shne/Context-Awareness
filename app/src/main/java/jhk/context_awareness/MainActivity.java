@@ -95,23 +95,23 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 	public void updateRingerMode() {
 		switch(availability) {
 			case CalendarContract.Events.AVAILABILITY_FREE:
-				if(am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
-					am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-				}
+				am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 				break;
 			case CalendarContract.Events.AVAILABILITY_BUSY:
 				switch(atEvent) {
 					case AT_EVENT:
-						if(am.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
-							am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
-						}
+						am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
 						break;
 					case NOT_AT_EVENT:
+						am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+						break;
+					case NO_LOCATION:
 						switch(movementType) {
-							default:
-								if(am.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
-									am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
-								}
+							case STILL:case WALKING:
+								am.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+								break;
+							case RUNNING:case BIKING:case DRIVING:
+								am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 								break;
 						}
 				}

@@ -13,16 +13,9 @@ public class AtEventContextProvider implements  DataConsumer<CalendarEvent>, Loc
     private CalendarEvent latestEvent;
     private Location latestLocation;
 
-    public void notifyConsumers(float f) {
+    public void notifyConsumers(AtEventType atEvent) {
         for(AtEventContextListener consumer : consumers) {
-            // TODO: Change stub
-            AtEventType i;
-            if(f  < 100)
-               i = AtEventType.AT_EVENT;
-            else
-               i = AtEventType.NOT_AT_EVENT;
-
-            consumer.onContextChanged(i, latestEvent.availability);
+            consumer.onContextChanged(atEvent, latestEvent.availability);
         }
     }
 
@@ -39,9 +32,18 @@ public class AtEventContextProvider implements  DataConsumer<CalendarEvent>, Loc
     }
 
     private void onChange() {
-        if(latestEvent != null && latestEvent.geoLocation != null && latestLocation != null) {
-            float distance  = latestEvent.geoLocation.distanceTo(latestLocation);
-            notifyConsumers(distance);
+        if(latestEvent != null && latestLocation != null) {
+	        AtEventType atEvent;
+	        if(latestEvent.geoLocation != null) {
+		        float distance = latestEvent.geoLocation.distanceTo(latestLocation);
+		        if (distance < 100)
+			        atEvent = AtEventType.AT_EVENT;
+		        else
+			        atEvent = AtEventType.NOT_AT_EVENT;
+	        } else {
+		        atEvent = AtEventType.NO_LOCATION;
+	        }
+	        notifyConsumers(atEvent);
         }
     }
 
