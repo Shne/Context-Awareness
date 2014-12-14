@@ -1,0 +1,14 @@
+Widget Architecture: 
+	Architectures for context. T. Winograd. Hum.-Comput. Interact. 16, 2, 401-419, 2001. 
+
+Artikel der gør præcis det vi vil:	
+	Using mobile phones to determine transportation modes. Reddy, S., Mun, M., Burke, J., Estrin, D., Hansen, M., & Srivastava, M.  ACM Transactions on Sensor Networks (TOSN), 6(2), 13, 2010.
+	
+Artikel der bl.a. beskriver hvordan man finder context og sensor fusion implementation:
+	Sensor fusion for context understanding. Wu, H., Siegel, M., & Ablay, S. In  Proceedings of the 19th IEEE Instrumentation and Measurement Technology Conference (IMTC), IEEE, 2002.
+	
+How to do good machine learning:
+	A few useful things to know about machine learning. Domingos, P. Communications of the ACM, 55(10), 78-87, 2012.
+
+	Overview of sensors and potential usages:
+	A survey of mobile phone sensing. Nicholas D. Lane, Emiliano Miluzzo, Hong Lu, Daniel Peebles, Tanzeem Choudhury, Andrew T. Campbell: IEEE Communications Magazine 48(9): 140-150 , 2010. 
