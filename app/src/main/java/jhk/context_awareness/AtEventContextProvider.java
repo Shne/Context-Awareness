@@ -22,7 +22,7 @@ public class AtEventContextProvider implements  DataConsumer<CalendarEvent>, Loc
             else
                i = AtEventType.NOT_AT_EVENT;
 
-            consumer.onContextChanged(i);
+            consumer.onContextChanged(i, latestEvent.availability);
         }
     }
 
