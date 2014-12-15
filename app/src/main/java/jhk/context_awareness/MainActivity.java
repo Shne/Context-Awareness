@@ -7,6 +7,7 @@ import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.provider.CalendarContract;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -72,20 +73,16 @@ public class MainActivity extends Activity implements AtEventContextListener, Co
 	}
 
 	@Override
-	public void onMovementTypeChanged(final MovementType movementType) {
-		this.movementType = movementType;
-
+	public void onMovementTypeChanged(final MovementType movement) {
+		movementType = movement;
+		Log.d("HERP", "location speed is "+currentSpeed);
         //Fix Driving vs. Still based on current speed.
-        //Don't know if the speeds are the right ones yet.
+        //Don't know if the speeds are the right ones yet.s
         //Not tested yet.
-        if(currentSpeed > 0.0 && currentSpeed <= 3.0){
-            if(this.movementType == MovementType.DRIVING){
-                this.movementType = MovementType.STILL;
-            }
-        }else if(currentSpeed > 3.0){
-            if(this.movementType == MovementType.STILL){
-                this.movementType = MovementType.DRIVING;
-            }
+        if(currentSpeed <= 3.0 && movementType == MovementType.DRIVING) {
+            movementType = MovementType.STILL;
+        } else if(currentSpeed > 3.0 && movementType == MovementType.STILL){
+            movementType = MovementType.DRIVING;
         }
 
         //Looks at previous element in classifier sequence and checks if it is probable.
@@ -93,17 +90,17 @@ public class MainActivity extends Activity implements AtEventContextListener, Co
         //Needs testing, and more cases could possibly be added
         if(classifierSequence.numberOfElements() > 0) {
             MovementType previous = classifierSequence.getLatestClassifiedMovement();
-            if (previous == MovementType.DRIVING && this.movementType == MovementType.BIKING) {
-                this.movementType = previous;
+            if (previous == MovementType.DRIVING && movementType == MovementType.BIKING) {
+                movementType = previous;
             } else if (previous == MovementType.BIKING
-                    && (this.movementType == MovementType.DRIVING
-                    || this.movementType == MovementType.RUNNING)) {
-                this.movementType = previous;
-            } else if (previous == MovementType.RUNNING && this.movementType == MovementType.DRIVING) {
-                this.movementType = previous;
+                    && (movementType == MovementType.DRIVING
+                    || movementType == MovementType.RUNNING)) {
+                movementType = previous;
+            } else if (previous == MovementType.RUNNING && movementType == MovementType.DRIVING) {
+                movementType = previous;
             }
         }
-        classifierSequence.add(this.movementType);
+        classifierSequence.add(movementType);
 
 		updateRingerMode();
 		this.runOnUiThread(new Runnable() {
