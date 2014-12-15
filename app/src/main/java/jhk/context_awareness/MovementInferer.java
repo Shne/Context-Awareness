@@ -2,6 +2,7 @@ package jhk.context_awareness;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.util.Log;
 
 import java.util.ArrayList;
 
