@@ -2,7 +2,6 @@ package jhk.context_awareness;
 
 import android.content.Context;
 import android.content.res.AssetManager;
-import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -73,7 +72,7 @@ public class MovementInferer implements DataConsumer<AccelerometerData[]>, Conte
 		calculateValues(eucNorms);
 		inferContext();
 		for(ContextListener<MovementType> cl : contextListeners) {
-			cl.onContextChanged(context);
+			cl.onMovementTypeChanged(context);
 		}
 	}
 

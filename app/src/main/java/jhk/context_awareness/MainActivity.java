@@ -11,19 +11,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import java.util.Queue;
 
-public class MainActivity extends Activity implements AtEventContextListener ,ContextListener<MovementType> {
+
+public class MainActivity extends Activity implements AtEventContextListener, ContextListener<MovementType>, SpeedListener {
 
 	private SensorManager sensorManager;
 	private Sensor accelerometer;
 	private AccelerometerDataProvider adp;
 	private int windowSize = 128;
 	private int calendarQueryIntervalMilis = 10000;
+    private double currentSpeed = 0.0;
 
 	AudioManager am;
 	MovementType movementType = MovementType.STILL;
 	AtEventType atEvent = AtEventType.NOT_AT_EVENT;
 	int availability = CalendarContract.Events.AVAILABILITY_FREE;
+    ClassifierSequence classifierSequence;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,7 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 
 		setupMovementDetection();
 		setupAtScheduledEventDetection();
+        classifierSequence = new ClassifierSequence(8);
 
         am = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
 
@@ -44,10 +49,13 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
         calendarLocationDataProvider.registerConsumer(eventGeoLocationFinder);
 
 	    AtEventContextProvider atEventContextProvider = new AtEventContextProvider();
+        SpeedProvider speedProvider = new SpeedProvider();
 	    eventGeoLocationFinder.registerConsumer(atEventContextProvider);
 	    LocationProvider locationProvider = new LocationProvider(appContext);
 	    locationProvider.registerConsumer(atEventContextProvider);
+        locationProvider.registerConsumer(speedProvider);
 	    atEventContextProvider.registerContextListener(this);
+        speedProvider.registerContextListener(this);
     }
 
 	private void setupMovementDetection() {
@@ -64,8 +72,39 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 	}
 
 	@Override
-	public void onContextChanged(final MovementType movementType) {
+	public void onMovementTypeChanged(final MovementType movementType) {
 		this.movementType = movementType;
+
+        //Fix Driving vs. Still based on current speed.
+        //Don't know if the speeds are the right ones yet.
+        //Not tested yet.
+        if(currentSpeed > 0.0 && currentSpeed <= 3.0){
+            if(this.movementType == MovementType.DRIVING){
+                this.movementType = MovementType.STILL;
+            }
+        }else if(currentSpeed > 3.0){
+            if(this.movementType == MovementType.STILL){
+                this.movementType = MovementType.DRIVING;
+            }
+        }
+
+        //Looks at previous element in classifier sequence and checks if it is probable.
+        //Could possible be extended to look at last few classifiers in stead of just the last one.
+        //Needs testing, and more cases could possibly be added
+        if(classifierSequence.numberOfElements() > 0) {
+            MovementType previous = classifierSequence.getLatestClassifiedMovement();
+            if (previous == MovementType.DRIVING && this.movementType == MovementType.BIKING) {
+                this.movementType = previous;
+            } else if (previous == MovementType.BIKING
+                    && (this.movementType == MovementType.DRIVING
+                    || this.movementType == MovementType.RUNNING)) {
+                this.movementType = previous;
+            } else if (previous == MovementType.RUNNING && this.movementType == MovementType.DRIVING) {
+                this.movementType = previous;
+            }
+        }
+        classifierSequence.add(this.movementType);
+
 		updateRingerMode();
 		this.runOnUiThread(new Runnable() {
 			@Override
@@ -78,7 +117,7 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 	}
 
 	@Override
-	public void onContextChanged(final AtEventType atEvent, int availability) {
+	public void onAtEventContextChanged(final AtEventType atEvent, int availability) {
 		this.atEvent = atEvent;
 		this.availability = availability;
 		updateRingerMode();
@@ -91,6 +130,11 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 			}
 		});
 	}
+
+    @Override
+    public void onSpeedChanged(double currentSpeed) {
+        this.currentSpeed = currentSpeed*3.6;
+    }
 
 	public void updateRingerMode() {
 		switch(availability) {
@@ -140,6 +184,7 @@ public class MainActivity extends Activity implements AtEventContextListener ,Co
 
 		return super.onOptionsItemSelected(item);
 	}
+
 
 
 }

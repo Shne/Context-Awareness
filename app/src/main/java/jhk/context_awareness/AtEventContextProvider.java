@@ -15,7 +15,7 @@ public class AtEventContextProvider implements  DataConsumer<CalendarEvent>, Loc
 
     public void notifyConsumers(AtEventType atEvent) {
         for(AtEventContextListener consumer : consumers) {
-            consumer.onContextChanged(atEvent, latestEvent.availability);
+            consumer.onAtEventContextChanged(atEvent, latestEvent.availability);
         }
     }
 
@@ -49,7 +49,6 @@ public class AtEventContextProvider implements  DataConsumer<CalendarEvent>, Loc
 
     public void registerContextListener(AtEventContextListener cl) {
         consumers.add(cl);
-
     }
 
     public void unregisterContextListener(AtEventContextListener cl) {
